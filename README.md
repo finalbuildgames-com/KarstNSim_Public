@@ -1,3 +1,68 @@
+## Final Build Games checkout notes
+
+This is a fork of [RING's KarstNSim_Public](https://github.com/ring-team/KarstNSim_Public).
+The default `main` branch imports upstream commit
+[`ff55d396`](https://github.com/ring-team/KarstNSim_Public/commit/ff55d3969842f456908a6946c8bc8160a5d65965)
+without code changes; this section adds local documentation. Work on the separate
+`perf/scientific-memory` and `perf/compact-cave-graphs` branches is not included in
+this default-branch checkout. The upstream overview, research citations, examples
+and contact information are preserved below.
+
+The current [CMake project](KarstNSim/CMakeLists.txt) requires **C++17**, overriding
+the older C++14 requirement below, and declares CMake compatibility as
+`3.8...3.28`. The following `-S`/`-B` commands require CMake 3.13 or newer; a 3.x
+installation with a C++17 compiler and the selected generator's build tools is a
+suitable starting point. Windows builds need Visual Studio's C++ workload and
+Windows SDK; Linux builds need a compiler and Make or Ninja.
+
+From the repository root:
+
+```sh
+cmake -S KarstNSim -B KarstNSim/build -DCMAKE_BUILD_TYPE=Release
+cmake --build KarstNSim/build --config Release
+```
+
+For a Windows Visual Studio generator, add `-A x64` to the configure command.
+Alternatively, run [build.bat](KarstNSim/build.bat) from `KarstNSim/`; it builds
+both Debug and Release. Run a Windows example from the configuration directory:
+
+```powershell
+cd KarstNSim/build/Release
+./karstnsim.exe ../../../Input_files/1_base/instructions.txt
+```
+
+The example's `main_repository: ../../..` and the interactive picker's
+`../../../Input_files` are relative to the **working directory**. For a Linux
+single-configuration build, the executable is `KarstNSim/build/karstnsim`.
+The optional standard-library-only [Python launcher](parallel_launcher.py)
+(Python 3.9+) can run it from the repository root, patching paths in generated
+instruction copies:
+
+```sh
+python3 parallel_launcher.py --help
+python3 parallel_launcher.py --exe KarstNSim/build/karstnsim --repo-root . --instructions Input_files/1_base/instructions.txt --seeds 1 --workers 1
+```
+
+Simulation runs write ASCII results and console logs under `outputs/`; the
+launcher additionally writes instructions/logs under `batch_runs/`. It can run
+the [four supplied examples](Input_files/) in sequence or across seeds. The CLI
+[entry point](KarstNSim/src/main.cpp) parses an instruction file, then the
+[simulation driver](KarstNSim/src/run_code.cpp) assembles/samples a graph, computes
+geologically weighted paths and optionally amplifies the network or simulates
+conduit dimensions. See [config_reference.md](config_reference.md) for inputs.
+There is no CTest suite on this branch: the supplied examples are simulation
+checks, and the CI workflow builds Linux/Windows targets. Compilation and simulation
+commands above have not been run as part of this documentation refresh.
+
+For API documentation, run `doxygen Doxyfile` from the repository root (with
+Doxygen installed), then open `html/index.html`.
+The code's [MIT license](LICENSE) names Université de Lorraine, ANDRA and BRGM;
+Final Build Games maintains this fork, not the original research authorship.
+The bundled [nanoflann header](KarstNSim/include/KarstNSim/nanoflann.hpp) retains
+its own BSD notice. Please keep the upstream citation and attribution below.
+
+---
+
 # KarstNSim_Public
 Public version of KarstNSim, a C++ code for graph-based and geologically-driven simulation of 3D karst networks.
 
